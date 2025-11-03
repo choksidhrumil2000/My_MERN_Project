@@ -2,31 +2,36 @@ const {authService} = require('../services/index');
 
 const register = async (req,res)=>{
 const user = req.body;
-try{
+// try{
     const result = await authService.registerUser(user);
     res.status(200).json({
         result,
         message:"User Registered Successfully!!!"
     })
-}catch(err){
-    res.status(400).json({
-        message:err.message
-    })
-}
+// }catch(err){
+//     res.status(400).json({
+//         message:err.message
+//     })
+// }
 }
 
 const login = async(req,res)=>{
     const userData = req.body;
-    try{
+    // try{
+        console.log(userData);
         const result = await authService.loginUser(userData);
         res.status(200).json({
+            result,
             message:'User LoggedIn Successfully!!'
         })
-    }catch(err){
-        res.status(401).json({
-            message:err.message,
-        })
-    }
+    // }catch(err){
+        
+        // console.log("Error:",err);
+        // // res.status(400).json({
+        // //     message:err,
+        // // })
+        // res.send({message:err.message})
+    // }
 }
 
 const logout = async(req,res)=>{

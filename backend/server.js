@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const {authRoutes} = require('./routes/index.js');
-const { ErrorHandler } = require('./middleware/index.js');
+const errorHandler = require('./middleware/erroHandler.js');
 
 
 const app = express();
@@ -23,7 +23,7 @@ app.use(express.json());//parse JSON request.......
 
 app.use('/api/auth',authRoutes);
 
-app.use(ErrorHandler);
+app.use(errorHandler);
 
 
 
