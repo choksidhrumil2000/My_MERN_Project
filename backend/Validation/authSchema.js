@@ -1,18 +1,18 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const registerSchema = joi.object({
-    name:joi.string().required(),
-    email:joi.string().required().email(),
-    password:joi.string().required().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
-    role:joi.string().allow('user','admin')
+  name: joi.string().required(),
+  email: joi.string().required().email(),
+  password: joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  role: joi.string().allow("user", "admin").default("user"),
 });
 
 const loginSchema = joi.object({
-    email:joi.string().email().required(),
-    password:joi.string().required().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-})
+  email: joi.string().email().required(),
+  password: joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+});
 
 module.exports = {
-    registerSchema,
-    loginSchema
-}
+  registerSchema,
+  loginSchema,
+};

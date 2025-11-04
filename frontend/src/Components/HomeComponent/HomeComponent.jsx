@@ -1,20 +1,26 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { loginContext } from "../../Context/LoginContext";
 import { useNavigate } from "react-router-dom";
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import styles from './HomeComponent.module.css';
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import styles from "./HomeComponent.module.css";
 import LoginOrSignUpFormComponent from "../LogInOrSignUpFormComponent/LogInOrSignUpFormComponent";
-
+import CircularProgress from "@mui/material/CircularProgress";
 
 const HomeComponent = () => {
   const navigate = useNavigate();
   const { isLoggedIn, setIsLoggedIn } = useContext(loginContext);
+  // const [isLoading, setIsLaoding] = useState(true);
 
   const [tabValue, setTabValue] = useState("1");
+
+  // useEffect(() => {
+  //   setTimeout(() => setIsLaoding(false), 2000);
+  //   // setIsLaoding(false);
+  // }, []);
 
   if (isLoggedIn) navigate("/dashboard");
 
@@ -23,26 +29,54 @@ const HomeComponent = () => {
   };
   return (
     <div className={`d_flex ${styles.mainDiv}`}>
+      {/* {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <div
+          style={{
+            border: "1px solid black",
+            borderRadius: "12px",
+            padding: "10px",
+            width: "500px",
+          }}
+        >
+          <TabContext value={tabValue}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <TabList onChange={handleTabChange} centered>
+                <Tab label="Login" value="1" />
+                <Tab label="Signup" value="2" />
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <LoginOrSignUpFormComponent form="LogIn" />
+            </TabPanel>
+            <TabPanel value="2">
+              <LoginOrSignUpFormComponent form="SignUp" />
+            </TabPanel>
+          </TabContext>
+        </div>
+      )} */}
       <div
         style={{
           border: "1px solid black",
           borderRadius: "12px",
           padding: "10px",
-          width:'500px'
+          width: "500px",
         }}
       >
         <TabContext value={tabValue}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList
-              onChange={handleTabChange}
-              centered
-            >
+            <TabList onChange={handleTabChange} centered>
               <Tab label="Login" value="1" />
               <Tab label="Signup" value="2" />
             </TabList>
           </Box>
-          <TabPanel value="1"><LoginOrSignUpFormComponent form="LogIn" /></TabPanel>
-          <TabPanel value="2"><LoginOrSignUpFormComponent form="SignUp"/></TabPanel>
+          <TabPanel value="1">
+            <LoginOrSignUpFormComponent form="LogIn" />
+          </TabPanel>
+          <TabPanel value="2">
+            <LoginOrSignUpFormComponent form="SignUp" />
+          </TabPanel>
         </TabContext>
       </div>
     </div>

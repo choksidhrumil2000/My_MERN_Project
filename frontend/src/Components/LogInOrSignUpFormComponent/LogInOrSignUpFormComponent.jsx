@@ -100,8 +100,15 @@ const LoginOrSignUpFormComponent = ({ form }) => {
       }
     }
     console.log(resObj);
-    sessionStorage.setItem("token", resObj.data.result.token);
-    setUserData(resObj.data.result.user);
+    sessionStorage.setItem(
+      "token",
+      JSON.stringify(resObj.data.final_result.token)
+    );
+    setUserData(resObj.data.final_result.user);
+    localStorage.setItem(
+      "userData",
+      JSON.stringify(resObj.data.final_result.user)
+    );
     setIsLoggedIn(true);
     showMessage("Welcome to The Dashboard!!!", "success");
     navigate("/dashboard");
@@ -169,7 +176,6 @@ const LoginOrSignUpFormComponent = ({ form }) => {
       >
         {form}
       </Button>
-
     </div>
   );
 };
