@@ -1,0 +1,31 @@
+.mainSectionDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.section {
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+}
+.subSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.inputSection {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.label_style {
+  font-weight: bold;
+}
+.btnSection {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 80%;
+}

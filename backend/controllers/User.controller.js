@@ -14,16 +14,84 @@ const addUser = async (req, res) => {
   });
 };
 
-const getUsers = async (req, res) => {
-  const usersData = await userService.getUsers();
+const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+  await userService.deleteUserById(userId);
   res.status(200).json({
-    usersData,
+    message: "User Deleted Successfully",
+  });
+};
+
+const getUsers = async (req, res) => {
+  const currentPage = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const filter = req.query.filter;
+  const sort = req.query.sort;
+  const search = req.query.search;
+
+  const usersData = await userService.getUsers();
+
+  let final_data = usersData;
+  // console.log(final_data);
+  if (search) {
+    final_data = final_data.filter(
+      (item) =>
+        item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.email.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+  if (filter) {
+    if (filter !== "all")
+      final_data = final_data.filter(
+        (item) => item.role.toLowerCase() === filter.toLowerCase()
+      );
+  }
+  if (sort) {
+    if (sort === "asc") {
+      final_data = final_data.sort((a, b) => b._id - a._id);
+    } else if (sort === "desc") {
+      final_data = final_data.sort((a, b) => a._id - b._id);
+    }
+  }
+
+  const totalPages = Math.ceil(final_data.length / limit);
+
+  // if (currentPage < 1 || (totalPages !== 0 && currentPage > totalPages)) {
+  //   // throw new ApiError(
+  //   //   404,
+  //   //   `Page Limit Exceeded !! There are only ${totalPages} Pages!!`
+  //   // );
+  //   return;
+  // }
+
+  const startingIndex = currentPage * limit - limit;
+  final_data = final_data.slice(startingIndex, currentPage * limit);
+
+  res.status(200).json({
+    currentPage,
+    startingIndex,
+    totalPages,
+    final_data,
+    limit,
+    allUsersData: usersData,
   });
 };
 
 const getProfile = async (req, res) => {
   const userId = req.params.id;
   const userData = await userService.getUserByUserId(userId);
+  if (!userData)
+    throw new ApiError(404, "User Not Found!! Data Could not be fetched!!!");
+  // console.log(userData);
+
+  res.status(200).json({
+    userData,
+  });
+};
+
+const getProfileByEmail = async (req, res) => {
+  const email = req.query.email;
+  const userData = await userService.getUserbyEmail(email);
   if (!userData)
     throw new ApiError(404, "User Not Found!! Data Could not be fetched!!!");
   // console.log(userData);
@@ -56,6 +124,7 @@ const updateProfile = async (req, res) => {
   //   if(!newData) throw new ApiError(304,"Update Does not Happen")
   res.status(200).json({
     newData,
+    message: "Updated Successfully",
   });
 };
 
@@ -80,4 +149,6 @@ module.exports = {
   addUser,
   getUsers,
   changePassword,
+  getProfileByEmail,
+  deleteUser,
 };

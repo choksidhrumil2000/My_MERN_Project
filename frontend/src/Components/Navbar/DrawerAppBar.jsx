@@ -21,7 +21,10 @@ import { userContext } from "../../Context/UserContext";
 import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 240;
-const navItems = ["Users", "Products"];
+const navItems = [
+  { tab: "Users", role: ["admin"] },
+  { tab: "Products", role: ["user", "admin"] },
+];
 
 function DrawerAppBar(props) {
   const { window, children, tabClickFunction, onLogout, openUserProfile } =
@@ -84,27 +87,31 @@ function DrawerAppBar(props) {
             {userData.role}
           </Typography>
         </Box>
-        <EditIcon
+        {/* <EditIcon
           sx={{ cursor: "pointer" }}
           onClick={() => goToUserProfile(true)}
-        />
+        /> */}
       </Box>
 
       <Divider />
       <List>
-        {navItems.map((item) => (
-          <Box key={item}>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ textAlign: "left" }}
-                onClick={() => tabClickFunction(item)}
-              >
-                <ListItemText primary={item} />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-          </Box>
-        ))}
+        {navItems.map((item) => {
+          if (item.role.includes(userData.role)) {
+            return (
+              <Box key={item.tab}>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    sx={{ textAlign: "left" }}
+                    onClick={() => tabClickFunction(item.tab)}
+                  >
+                    <ListItemText primary={item.tab} />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+              </Box>
+            );
+          }
+        })}
       </List>
     </Box>
   );
@@ -166,7 +173,7 @@ function DrawerAppBar(props) {
         </Drawer>
       </nav>
       <Box component="main" sx={{ p: 3 }}>
-        {/* <Toolbar /> */}
+        <Toolbar />
         {children}
       </Box>
     </Box>

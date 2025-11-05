@@ -15,7 +15,7 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { loginContext } from "../../Context/LoginContext";
 import { userContext } from "../../Context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../Context/SnackBarContext";
 const LoginOrSignUpFormComponent = ({ form }) => {
   const { isLoggedIn, setIsLoggedIn } = useContext(loginContext);
@@ -166,7 +166,14 @@ const LoginOrSignUpFormComponent = ({ form }) => {
           label="Password"
         />
       </FormControl>
-
+      {form === "LogIn" && (
+        <Link
+          to="/changepassword"
+          style={{ textDecoration: "underline", marginTop: "10px" }}
+        >
+          Forgot Password?
+        </Link>
+      )}
       {/* Login/Signup Button...................... */}
       <Button
         variant="contained"

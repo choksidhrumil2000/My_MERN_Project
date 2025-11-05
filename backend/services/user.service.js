@@ -8,6 +8,8 @@ const getUserbyEmail = async (email) => await User.findOne({ email });
 
 const getUsers = async () => await User.find();
 
+const deleteUserById = async (userId) => await User.deleteOne({ _id: userId });
+
 // const findOneAndUpdate = async (oldData, newData) =>
 //   await User.findOneAndUpdate({ email: oldData.email }, newData, {
 //     new: true,
@@ -39,5 +41,6 @@ module.exports = {
   createUser,
   getUserbyEmail,
   getUsers,
+  deleteUserById,
   //   findOneAndUpdate,
 };

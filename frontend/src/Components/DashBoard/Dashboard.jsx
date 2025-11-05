@@ -9,20 +9,46 @@ import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import UserProfilePage from "../../Pages/UserProfilePage/UserProfilePage";
+import { loginContext } from "../../Context/LoginContext";
 
 const DashBoard = () => {
   const [currentTab, setCurrentTab] = useState("");
   const { userData, setUserData, loading } = useContext(userContext);
+  const { setIsLoggedIn } = useContext(loginContext);
+
   const [editFlag, setEditFlag] = useState(false);
+
+  // const [editProfileSection, setEditProfileSection] = useState(false);
+  // const [securitySectionEdit, setSecuritySectionEdit] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (userData.role) {
-      if (userData.role === "admin") setCurrentTab("Users");
-      else setCurrentTab("Products");
+      if (currentTab === "") {
+        if (userData.role === "admin") setCurrentTab("Users");
+        else setCurrentTab("Products");
+        localStorage.setItem("currentTab", currentTab);
+      }
     }
   }, [userData]);
+
+  useEffect(() => {
+    const activeTab = localStorage.getItem("currentTab");
+    if (activeTab) {
+      setCurrentTab(activeTab);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("currentTab", currentTab);
+  }, [currentTab]);
+  // useEffect(()=>{
+  //    if (userData.role) {
+  //     if (userData.role === "admin") setCurrentTab("Users");
+  //     else setCurrentTab("Products");
+  //   }
+  // },[]);
 
   const handleTabClickedinDrawer = (tab) => {
     setCurrentTab(tab);
@@ -36,7 +62,16 @@ const DashBoard = () => {
       case "Products":
         return <ProductsPage />;
       case "UserProfile":
-        return <UserProfilePage />;
+        return (
+          <UserProfilePage
+          // editProfileSection={editProfileSection}
+          // setEditProfileSection={setEditProfileSection}
+          // securitySectionEdit={securitySectionEdit}
+          // setSecuritySectionEdit ={setSecuritySectionEdit}
+          // userData={userData}
+          // setterOfUserData={setUserData}
+          />
+        );
       default:
         return null;
     }
@@ -45,6 +80,7 @@ const DashBoard = () => {
   const onLogout = () => {
     sessionStorage.clear();
     localStorage.clear();
+    setIsLoggedIn(false);
     navigate("/");
   };
 
@@ -76,7 +112,7 @@ const DashBoard = () => {
         tabClickFunction={handleTabClickedinDrawer}
         openUserProfile={openUserProfile}
       >
-        <p>Page will Load Here</p>
+        {/* <p>Page will Load Here</p> */}
         {/* {currentTab === 'Users' && <UsersPage />}
         {currentTab === 'Products' && <ProductsPage /> }
         <div style={{height:'100vh',width:'100vw',background:'black'}}>hello</div> */}
