@@ -1,5 +1,4 @@
 import * as React from "react";
-import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,8 +12,6 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import EditIcon from "@mui/icons-material/Edit";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useContext } from "react";
 import { userContext } from "../../Context/UserContext";
@@ -31,14 +28,14 @@ function DrawerAppBar(props) {
     props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const { userData, setUserData } = useContext(userContext);
+  const { userData } = useContext(userContext);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
-  const goToUserProfile = (editFlag) => {
-    openUserProfile(editFlag);
+  const goToUserProfile = () => {
+    openUserProfile();
   };
 
   const drawer = (
@@ -71,7 +68,7 @@ function DrawerAppBar(props) {
                 textDecoration: "underline",
               },
             }}
-            onClick={() => goToUserProfile(false)}
+            onClick={() => goToUserProfile()}
           >
             {userData.name}
           </Typography>
@@ -87,10 +84,6 @@ function DrawerAppBar(props) {
             {userData.role}
           </Typography>
         </Box>
-        {/* <EditIcon
-          sx={{ cursor: "pointer" }}
-          onClick={() => goToUserProfile(true)}
-        /> */}
       </Box>
 
       <Divider />
@@ -110,6 +103,8 @@ function DrawerAppBar(props) {
                 <Divider />
               </Box>
             );
+          }else{
+            return null;
           }
         })}
       </List>
@@ -140,13 +135,6 @@ function DrawerAppBar(props) {
           >
             My MERN Project
           </Typography>
-          {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {navItems.map((item) => (
-              <Button key={item} sx={{ color: '#fff' }}>
-                {item}
-              </Button>
-            ))}
-          </Box> */}
           <Tooltip title="Logout" arrow>
             <LogoutIcon style={{ cursor: "pointer" }} onClick={onLogout} />
           </Tooltip>
@@ -179,13 +167,5 @@ function DrawerAppBar(props) {
     </Box>
   );
 }
-
-DrawerAppBar.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window: PropTypes.func,
-};
 
 export default DrawerAppBar;

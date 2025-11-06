@@ -19,18 +19,16 @@ const ChangePasswordPage = () => {
   const { showMessage } = useSnackbar();
 
   const checkIfUserExist = async () => {
-    if(error)return;
+    if (error) return;
     let resObj;
     try {
       resObj = await axios.get(
         process.env.REACT_APP_API_URL + `/user/profile?email=${email}`
       );
     } catch (err) {
-      console.log(err);
       showMessage(err.response.data.message, "error");
       return;
     }
-    console.log(resObj.data.userData);
     setCurrUserData(resObj.data.userData);
     setVerified(true);
   };
@@ -66,11 +64,9 @@ const ChangePasswordPage = () => {
         }
       );
     } catch (err) {
-      console.log(err);
       showMessage(err.response.data.message, "error");
       return;
     }
-    console.log(resObj);
     showMessage(resObj.data.message);
     navigate("/");
   };

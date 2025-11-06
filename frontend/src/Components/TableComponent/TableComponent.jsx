@@ -7,40 +7,45 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import TablePagination from "@mui/material/TablePagination";
 import TableFooter from "@mui/material/TableFooter";
-import TablePaginationActions from "@mui/material/TablePaginationActions";
 import Pagination from "@mui/material/Pagination";
+import { useContext } from "react";
+import { userContext } from "../../Context/UserContext";
 
-const TableComponent = ({ data, setData }) => {
+const TableComponent = ({
+  data,
+  setData,
+  handleDeleteRecord,
+  handleEditRecord,
+}) => {
+  const { userData } = useContext(userContext);
   const handleChangePage = (event, newPage) => {
-    console.log(newPage, data.totalPages);
     if (newPage < 1) {
       newPage = 1;
-      // setData.setCurrentPage(1);
       return;
     }
     if (newPage > data.totalPages) {
       newPage = data.totalPages;
-      // setData.setCurrentPage(data.totalPages);
       return;
     }
     setData.setCurrentPage(newPage);
   };
   const handleDeleteUser = (userId) => {
-    
+    handleDeleteRecord(userId);
   };
 
-  const handleEditUser = () => {};
+  const handleEditUser = (userData) => {
+    handleEditRecord(userData);
+  };
 
   return (
     <div>
       <TableContainer component={Paper}>
         <Table
           sx={{
-            minWidth: "1000px",
-            "@media (max-width: 600px)": {
-              minWidth: "700px",
+            minWidth: "650px",
+            "@media (max-width: 763px)": {
+              minWidth: "763px",
             },
           }}
           aria-label="simple table"
@@ -68,39 +73,21 @@ const TableComponent = ({ data, setData }) => {
                 <TableCell align="right">{row.role}</TableCell>
                 <TableCell align="right">
                   <EditIcon
-                    onClick={()=> handleEditUser(row._id) }
-                    sx={{ marginRight: "10px" }}
+                    onClick={() => handleEditUser(row)}
+                    sx={{ marginRight: "10px", cursor: "pointer" }}
                   />
-                  <DeleteIcon
-                    onClick={()=> handleDeleteUser(row._id) }
-                    sx={{ marginTop: "10px" }}
-                  />
+                  {userData.email !== row.email && (
+                    <DeleteIcon
+                      onClick={() => handleDeleteUser(row._id)}
+                      sx={{ marginTop: "10px", cursor: "pointer" }}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter>
             <TableRow>
-              {/* <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={3}
-                count={data.allUsersData.length}
-                rowsPerPage={data.limit}
-                page={data.currentPage}
-                totalPages={data.totalPages}
-                slotProps={{
-                  select: {
-                    inputProps: {
-                      "aria-label": "rows per page",
-                    },
-                    native: true,
-                  },
-                }}
-                onPageChange={handleChangePage}
-                // onRowsPerPageChange={handleChangeRowsPerPage}
-                // ActionsComponent={TablePaginationActions}
-              /> */}
-
               <TableCell colSpan={5}>
                 <Pagination
                   count={data.totalPages}

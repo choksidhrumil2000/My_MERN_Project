@@ -27,7 +27,7 @@ const protect = async (req, res, next) => {
 
 const authorizeRole = (role) => (req, res, next) => {
   //   if (!req.user || !role.includes(req.user.role)) {
-  // console.log("loggedin User: ",req.user);
+  // console.log("loggedin User: ", req.user);
   if (!req.user || !(req.user.role === role)) {
     return res.status(403).json({
       message: `Access Denied: permission  not granted only ${role} can access!!`,

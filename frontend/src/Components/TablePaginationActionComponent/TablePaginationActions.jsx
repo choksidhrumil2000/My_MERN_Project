@@ -5,11 +5,12 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
+
+//temperary Not Using Anywhere............................
+
 function TablePaginationActions(props) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange, totalPages } = props;
-
-  console.log(page);
 
   const handleFirstPageButtonClick = (event) => {
     onPageChange(event, 0);
@@ -21,7 +22,6 @@ function TablePaginationActions(props) {
   };
 
   const handleNextButtonClick = (event) => {
-    console.log(page, totalPages);
     if (page === totalPages) return;
     onPageChange(event, page + 1);
   };

@@ -15,16 +15,7 @@ import { useSnackbar } from "../../Context/SnackBarContext";
 import axios from "axios";
 import { userContext } from "../../Context/UserContext";
 
-const UserProfilePage = (
-  {
-    // userData,
-    // setterOfUserData,
-    // editProfileSection,
-    // setEditProfileSection,
-    // securitySectionEdit,
-    // setSecuritySectionEdit,
-  }
-) => {
+const UserProfilePage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
@@ -59,24 +50,12 @@ const UserProfilePage = (
         {
           password: newPassword,
         }
-        // ,
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${JSON.parse(
-        //       sessionStorage.getItem("token")
-        //     )}`,
-        //   },
-        // }
       );
     } catch (err) {
-      console.log(err);
       showMessage(err.response.data.message, "error");
-      // console.log("SaveUserProfile Error", err);
       return;
     }
-    console.log(resObj);
     showMessage(resObj.data.message);
-    // setterOfUserData(editedUserData);
     setNewPassword("");
     setSecuritySectionEdit(false);
   };
@@ -97,14 +76,10 @@ const UserProfilePage = (
         }
       );
     } catch (err) {
-      console.log(err);
       showMessage(err.response.data.message, "error");
-      // console.log("SaveUserProfile Error", err);
       return;
     }
-    console.log(resObj);
     showMessage(resObj.data.message);
-    // setterOfUserData(editedUserData);
     setUserData(editedUserData);
     setEditProfileSection(false);
   };
@@ -160,7 +135,7 @@ const UserProfilePage = (
       <h1>{`Hello, ${editedUserData.name}!!!`}</h1>
       <div className={`${styles.mainSectionDiv}`}>
         <h2>UserProfile Section</h2>
-        <EditIcon onClick={handleEditProfile} />
+        <EditIcon sx={{ cursor: "pointer" }} onClick={handleEditProfile} />
       </div>
       <div className={`${styles.section}`}>
         <div className={`${styles.subSection}`}>
@@ -238,7 +213,7 @@ const UserProfilePage = (
 
       <div className={`${styles.mainSectionDiv}`}>
         <h2>Security Section</h2>
-        <EditIcon onClick={handlePasswordEdit} />
+        <EditIcon sx={{ cursor: "pointer" }} onClick={handlePasswordEdit} />
       </div>
       <div className={`${styles.section}`}>
         <div className={`${styles.subSection}`}>

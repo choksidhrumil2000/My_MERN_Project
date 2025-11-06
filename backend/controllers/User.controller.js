@@ -48,9 +48,9 @@ const getUsers = async (req, res) => {
   }
   if (sort) {
     if (sort === "asc") {
-      final_data = final_data.sort((a, b) => b._id - a._id);
+      final_data = final_data.sort((b, a) => b.createdAt - a.createdAt);
     } else if (sort === "desc") {
-      final_data = final_data.sort((a, b) => a._id - b._id);
+      final_data = final_data.sort((b, a) => a.createdAt - b.createdAt);
     }
   }
 
@@ -74,6 +74,7 @@ const getUsers = async (req, res) => {
     final_data,
     limit,
     allUsersData: usersData,
+    message: "Data Fetched Successfully!!",
   });
 };
 

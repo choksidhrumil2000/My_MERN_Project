@@ -4,12 +4,12 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import TextField from "@mui/material/TextField";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import styles from "./LogInOrSignUpFormComponent.module.css";
+import styles from "./ReUsableForm.module.css";
 import Button from "@mui/material/Button";
 
 import axios from "axios";
@@ -17,9 +17,18 @@ import { loginContext } from "../../Context/LoginContext";
 import { userContext } from "../../Context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../Context/SnackBarContext";
-const LoginOrSignUpFormComponent = ({ form }) => {
-  const { isLoggedIn, setIsLoggedIn } = useContext(loginContext);
-  const { userData, setUserData } = useContext(userContext);
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+const ReUsableForm = ({
+  form,
+  editData,
+  closeModal,
+  tableData,
+  setTableDataFunctions,
+  refreshtable,
+}) => {
+  const { setIsLoggedIn } = useContext(loginContext);
+  const { setUserData } = useContext(userContext);
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -27,8 +36,21 @@ const LoginOrSignUpFormComponent = ({ form }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
 
   const { showMessage } = useSnackbar();
+
+  useEffect(() => {
+    if (form === "EditUser") {
+      setName(editData.name);
+      setEmail(editData.email);
+      setRole(editData.role);
+    } else if (form === "AddUser") {
+      setName("");
+      setEmail("");
+      setRole("");
+    }
+  }, []);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -52,6 +74,10 @@ const LoginOrSignUpFormComponent = ({ form }) => {
     setPassword(e.target.value);
   };
 
+  const handleRoleChange = (e) => {
+    setRole(e.target.value);
+  };
+
   const handleLogInSignUpActivity = async () => {
     let resObj;
     let userObj;
@@ -60,7 +86,6 @@ const LoginOrSignUpFormComponent = ({ form }) => {
         email,
         password,
       };
-      console.log(userObj);
       try {
         resObj = await axios.post(
           process.env.REACT_APP_API_URL + "/auth/login",
@@ -73,10 +98,9 @@ const LoginOrSignUpFormComponent = ({ form }) => {
         );
       } catch (err) {
         showMessage(err.response.data.message, "error");
-        console.log("Login Error", err);
         return;
       }
-    } else {
+    } else if (form === "SignUp") {
       userObj = {
         name,
         email,
@@ -95,11 +119,77 @@ const LoginOrSignUpFormComponent = ({ form }) => {
         );
       } catch (err) {
         showMessage(err.respone.data.message, "error");
-        console.log("SignUp Error", err);
         return;
       }
+    } else if (form === "AddUser") {
+      userObj = {
+        name,
+        email,
+        password,
+        role,
+      };
+      try {
+        resObj = await axios.post(
+          process.env.REACT_APP_API_URL + "/user/",
+          userObj,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                sessionStorage.getItem("token")
+              )}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        showMessage(resObj.data.message, "success");
+        closeModal();
+        refreshtable(
+          tableData.currentPage,
+          tableData.limit,
+          tableData.filter,
+          tableData.sort,
+          tableData.searchText
+        );
+      } catch (err) {
+        showMessage(err.response.data.message, "error");
+        return;
+      }
+      return;
+    } else if (form === "EditUser") {
+      userObj = {
+        name,
+        email,
+        role,
+      };
+      try {
+        resObj = await axios.put(
+          process.env.REACT_APP_API_URL + `/user/profile/${editData._id}`,
+          userObj,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                sessionStorage.getItem("token")
+              )}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        showMessage(resObj.data.message, "success");
+        closeModal();
+        refreshtable(
+          tableData.currentPage,
+          tableData.limit,
+          tableData.filter,
+          tableData.sort,
+          tableData.searchText
+        );
+      } catch (err) {
+        showMessage(err.response.data.message, "error");
+        return;
+      }
+
+      return;
     }
-    console.log(resObj);
     sessionStorage.setItem(
       "token",
       JSON.stringify(resObj.data.final_result.token)
@@ -116,7 +206,7 @@ const LoginOrSignUpFormComponent = ({ form }) => {
 
   return (
     <div>
-      {form === "SignUp" && (
+      {form !== "LogIn" && (
         <TextField
           label="Name"
           type="text"
@@ -148,6 +238,7 @@ const LoginOrSignUpFormComponent = ({ form }) => {
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={handlePasswordChnage}
+          disabled={form === "EditUser"}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -166,6 +257,27 @@ const LoginOrSignUpFormComponent = ({ form }) => {
           label="Password"
         />
       </FormControl>
+
+      {/* Role...................................... */}
+      {(form === "AddUser" || form === "EditUser") && (
+        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} fullWidth>
+          <InputLabel id="input-select">Role</InputLabel>
+          <Select
+            id="input-select"
+            value={role}
+            onChange={handleRoleChange}
+            fullWidth
+            label="Role"
+          >
+            {/* <MenuItem value="">
+              <em>None</em>
+            </MenuItem> */}
+            <MenuItem value={"user"}>user</MenuItem>
+            <MenuItem value={"admin"}>admin</MenuItem>
+          </Select>
+        </FormControl>
+      )}
+
       {form === "LogIn" && (
         <Link
           to="/changepassword"
@@ -174,7 +286,7 @@ const LoginOrSignUpFormComponent = ({ form }) => {
           Forgot Password?
         </Link>
       )}
-      {/* Login/Signup Button...................... */}
+      {/* Login/Signup/AddUser/EditUser,etc.... Button...................... */}
       <Button
         variant="contained"
         className={`${styles.marginTop_16}`}
@@ -187,4 +299,4 @@ const LoginOrSignUpFormComponent = ({ form }) => {
   );
 };
 
-export default LoginOrSignUpFormComponent;
+export default ReUsableForm;

@@ -13,13 +13,8 @@ import { loginContext } from "../../Context/LoginContext";
 
 const DashBoard = () => {
   const [currentTab, setCurrentTab] = useState("");
-  const { userData, setUserData, loading } = useContext(userContext);
+  const { userData, loading } = useContext(userContext);
   const { setIsLoggedIn } = useContext(loginContext);
-
-  const [editFlag, setEditFlag] = useState(false);
-
-  // const [editProfileSection, setEditProfileSection] = useState(false);
-  // const [securitySectionEdit, setSecuritySectionEdit] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,35 +38,19 @@ const DashBoard = () => {
   useEffect(() => {
     localStorage.setItem("currentTab", currentTab);
   }, [currentTab]);
-  // useEffect(()=>{
-  //    if (userData.role) {
-  //     if (userData.role === "admin") setCurrentTab("Users");
-  //     else setCurrentTab("Products");
-  //   }
-  // },[]);
 
   const handleTabClickedinDrawer = (tab) => {
     setCurrentTab(tab);
   };
 
   const renderComponent = () => {
-    console.log(currentTab);
     switch (currentTab) {
       case "Users":
         return <UsersPage />;
       case "Products":
         return <ProductsPage />;
       case "UserProfile":
-        return (
-          <UserProfilePage
-          // editProfileSection={editProfileSection}
-          // setEditProfileSection={setEditProfileSection}
-          // securitySectionEdit={securitySectionEdit}
-          // setSecuritySectionEdit ={setSecuritySectionEdit}
-          // userData={userData}
-          // setterOfUserData={setUserData}
-          />
-        );
+        return <UserProfilePage />;
       default:
         return null;
     }
@@ -84,13 +63,11 @@ const DashBoard = () => {
     navigate("/");
   };
 
-  const openUserProfile = (editFlag) => {
+  const openUserProfile = () => {
     setCurrentTab("UserProfile");
-    setEditFlag(editFlag);
   };
 
   if (loading) {
-    console.log("loading");
     return (
       <Box
         sx={{
@@ -112,10 +89,6 @@ const DashBoard = () => {
         tabClickFunction={handleTabClickedinDrawer}
         openUserProfile={openUserProfile}
       >
-        {/* <p>Page will Load Here</p> */}
-        {/* {currentTab === 'Users' && <UsersPage />}
-        {currentTab === 'Products' && <ProductsPage /> }
-        <div style={{height:'100vh',width:'100vw',background:'black'}}>hello</div> */}
         {renderComponent()}
       </DrawerAppBar>
     </div>
