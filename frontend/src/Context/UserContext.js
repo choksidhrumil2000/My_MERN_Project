@@ -16,9 +16,9 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     setLoading(true);
     if (Object.keys(userData).length !== 0) {
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("userData", JSON.stringify(userData));
     } else {
-      localStorage.removeItem("user");
+      localStorage.removeItem("userData");
     }
     setLoading(false);
   }, [userData]);

@@ -16,7 +16,17 @@ const addUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
-  await userService.deleteUserById(userId);
+
+  const userData = await userService.getUserByUserId(userId);
+
+  if (!userData)
+    throw new ApiError(404, "User tobe deleted Not Found In Database!!");
+
+  const deleteUserObj = await userService.deleteUserById(userId);
+
+  if (deleteUserObj.deletedCount === 0)
+    throw new ApiError(500, "There is a Problem in Deleting User!!");
+
   res.status(200).json({
     message: "User Deleted Successfully",
   });

@@ -197,24 +197,23 @@ const UsersPage = () => {
       );
 
       showMessage(resObj.data.message, "success");
-      if (data.finalData.length === 1) {
-        if (data.currentPage === data.totalPages) {
-          getAllUsersDataFromChangedParameters(
-            currentPage - 1,
-            limit,
-            filter,
-            sort,
-            searchText
-          );
-        }
+      if (data.finalData.length === 1 && data.currentPage === data.totalPages) {
+        getAllUsersDataFromChangedParameters(
+          currentPage - 1,
+          limit,
+          filter,
+          sort,
+          searchText
+        );
+      } else {
+        getAllUsersDataFromChangedParameters(
+          currentPage,
+          limit,
+          filter,
+          sort,
+          searchText
+        );
       }
-      getAllUsersDataFromChangedParameters(
-        currentPage,
-        limit,
-        filter,
-        sort,
-        searchText
-      );
     } catch (err) {
       showMessage(
         err.response?.data?.message || "Error in Deleting Record!!",
@@ -382,7 +381,9 @@ const UsersPage = () => {
             setData={setData}
             handleDeleteRecord={handleDeleteRecord}
             handleEditRecord={handleEditRecord}
+            type="User"
           />
+
           <BasicModal
             open={openModal}
             handleOpen={handleOpenModal}

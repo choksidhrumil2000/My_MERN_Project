@@ -38,6 +38,9 @@ const ReUsableForm = ({
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
 
+  const [category, setCategory] = useState("");
+  const [price, setPrice] = useState(0);
+
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
@@ -49,6 +52,14 @@ const ReUsableForm = ({
       setName("");
       setEmail("");
       setRole("");
+    } else if (form === "EditProduct") {
+      setName(editData.name);
+      setCategory(editData.category);
+      setPrice(editData.price);
+    } else if (form === "AddUser") {
+      setName("");
+      setCategory("");
+      setPrice(0);
     }
   }, []);
 
@@ -78,9 +89,10 @@ const ReUsableForm = ({
     setRole(e.target.value);
   };
 
-  const handleLogInSignUpActivity = async () => {
+  const handleformSubmitActivity = async () => {
     let resObj;
     let userObj;
+    let productObj;
     if (form === "LogIn") {
       userObj = {
         email,
@@ -189,6 +201,73 @@ const ReUsableForm = ({
       }
 
       return;
+    } else if (form === "AddProduct") {
+      productObj = {
+        name,
+        category,
+        price,
+      };
+      try {
+        resObj = await axios.post(
+          process.env.REACT_APP_API_URL + "/product/",
+          productObj,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                sessionStorage.getItem("token")
+              )}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        showMessage(resObj.data.message, "success");
+        closeModal();
+        refreshtable(
+          tableData.currentPage,
+          tableData.limit,
+          tableData.filter,
+          tableData.sort,
+          tableData.searchText
+        );
+      } catch (err) {
+        showMessage(err.response.data.message, "error");
+        return;
+      }
+      return;
+    } else if (form === "EditProduct") {
+      productObj = {
+        name,
+        category,
+        price,
+      };
+      try {
+        resObj = await axios.put(
+          process.env.REACT_APP_API_URL + `/product/${editData._id}`,
+          productObj,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                sessionStorage.getItem("token")
+              )}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        showMessage(resObj.data.message, "success");
+        closeModal();
+        refreshtable(
+          tableData.currentPage,
+          tableData.limit,
+          tableData.filter,
+          tableData.sort,
+          tableData.searchText
+        );
+      } catch (err) {
+        showMessage(err.response.data.message, "error");
+        return;
+      }
+
+      return;
     }
     sessionStorage.setItem(
       "token",
@@ -204,6 +283,14 @@ const ReUsableForm = ({
     navigate("/dashboard");
   };
 
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+  };
+
+  const handlePriceChange = (e) => {
+    setPrice(e.target.value);
+  };
+
   return (
     <div>
       {form !== "LogIn" && (
@@ -216,47 +303,53 @@ const ReUsableForm = ({
         />
       )}
       {/* email................. */}
-      <TextField
-        label="Email"
-        type="email"
-        value={email}
-        onChange={handleEmailChange}
-        className={`${!(form === "LogIn") ? styles.marginTop_16 : ""}`}
-        fullWidth
-      />
+      {form !== "AddProduct" && form !== "EditProduct" && (
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={handleEmailChange}
+          className={`${!(form === "LogIn") ? styles.marginTop_16 : ""}`}
+          fullWidth
+        />
+      )}
 
       {/* pasword.......................... */}
 
-      <FormControl
-        className={`${styles.marginTop_16}`}
-        fullWidth
-        variant="outlined"
-      >
-        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-        <OutlinedInput
-          id="outlined-adornment-password"
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={handlePasswordChnage}
-          disabled={form === "EditUser"}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label={
-                  showPassword ? "hide the password" : "display the password"
-                }
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                onMouseUp={handleMouseUpPassword}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-          label="Password"
-        />
-      </FormControl>
+      {(form === "LogIn" || form === "SignUp") && (
+        <FormControl
+          className={`${styles.marginTop_16}`}
+          fullWidth
+          variant="outlined"
+        >
+          <InputLabel htmlFor="outlined-adornment-password">
+            Password
+          </InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={handlePasswordChnage}
+            disabled={form === "EditUser"}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showPassword ? "hide the password" : "display the password"
+                  }
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  onMouseUp={handleMouseUpPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+          />
+        </FormControl>
+      )}
 
       {/* Role...................................... */}
       {(form === "AddUser" || form === "EditUser") && (
@@ -278,6 +371,38 @@ const ReUsableForm = ({
         </FormControl>
       )}
 
+      {/* Category of Product...................................... */}
+      {(form === "AddProduct" || form === "EditProduct") && (
+        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} fullWidth>
+          <InputLabel id="input-select">Category</InputLabel>
+          <Select
+            id="input-select"
+            value={category}
+            onChange={handleCategoryChange}
+            fullWidth
+            label="Category"
+          >
+            {/* <MenuItem value="">
+              <em>None</em>
+            </MenuItem> */}
+            <MenuItem value={"electronics"}>Electronics</MenuItem>
+            <MenuItem value={"cloths"}>Cloths</MenuItem>
+          </Select>
+        </FormControl>
+      )}
+      {/* Price Of Product.......................... */}
+      {(form === "AddProduct" || form === "EditProduct") && (
+        <TextField
+          label="Price"
+          type="number"
+          value={price}
+          onChange={handlePriceChange}
+          fullWidth
+          inputProps={{ min: 0, step: 1 }}
+          sx={{ my: 1 }}
+        />
+      )}
+
       {form === "LogIn" && (
         <Link
           to="/changepassword"
@@ -291,7 +416,7 @@ const ReUsableForm = ({
         variant="contained"
         className={`${styles.marginTop_16}`}
         fullWidth
-        onClick={handleLogInSignUpActivity}
+        onClick={handleformSubmitActivity}
       >
         {form}
       </Button>

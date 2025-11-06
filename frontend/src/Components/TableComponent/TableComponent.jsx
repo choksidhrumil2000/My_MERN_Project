@@ -17,6 +17,7 @@ const TableComponent = ({
   setData,
   handleDeleteRecord,
   handleEditRecord,
+  type,
 }) => {
   const { userData } = useContext(userContext);
   const handleChangePage = (event, newPage) => {
@@ -30,12 +31,23 @@ const TableComponent = ({
     }
     setData.setCurrentPage(newPage);
   };
-  const handleDeleteUser = (userId) => {
-    handleDeleteRecord(userId);
+  const handleDelete = (Id) => {
+    handleDeleteRecord(Id);
   };
 
-  const handleEditUser = (userData) => {
-    handleEditRecord(userData);
+  const handleEdit = (data) => {
+    handleEditRecord(data);
+  };
+
+  const generateHeader = (typeOfTable) => {
+    switch (typeOfTable) {
+      case "User":
+        return ["Sr.No", "Name", "Email", "Role", "Actions"];
+      case "Product":
+        return ["Sr.No", "Name", "Price", "Category", "Actions"];
+      default:
+        return;
+    }
   };
 
   return (
@@ -52,11 +64,20 @@ const TableComponent = ({
         >
           <TableHead>
             <TableRow>
-              <TableCell>Sr.No.</TableCell>
+              {generateHeader(type).map((item) => {
+                if (item === "Actions" && userData.role !== "admin")
+                  return null;
+                return (
+                  <TableCell key={item} align="right">
+                    {item}
+                  </TableCell>
+                );
+              })}
+              {/* <TableCell>Sr.No.</TableCell>
               <TableCell align="right">Name</TableCell>
               <TableCell align="right">Email</TableCell>
               <TableCell align="right">Role</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="right">Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -68,17 +89,26 @@ const TableComponent = ({
                 <TableCell component="th" scope="row">
                   {data.startingIndex + i + 1}
                 </TableCell>
-                <TableCell align="right">{row.name}</TableCell>
+                {generateHeader(type).map((item, i, arr) => {
+                  if (i !== 0 && i !== arr.length - 1) {
+                    return (
+                      <TableCell key={item.toLowerCase()} align="right">
+                        {row[item.toLowerCase()]}
+                      </TableCell>
+                    );
+                  }
+                })}
+                {/* <TableCell align="right">{row.name}</TableCell>
                 <TableCell align="right">{row.email}</TableCell>
-                <TableCell align="right">{row.role}</TableCell>
+                <TableCell align="right">{row.role}</TableCell> */}
                 <TableCell align="right">
                   <EditIcon
-                    onClick={() => handleEditUser(row)}
+                    onClick={() => handleEdit(row)}
                     sx={{ marginRight: "10px", cursor: "pointer" }}
                   />
                   {userData.email !== row.email && (
                     <DeleteIcon
-                      onClick={() => handleDeleteUser(row._id)}
+                      onClick={() => handleDelete(row._id)}
                       sx={{ marginTop: "10px", cursor: "pointer" }}
                     />
                   )}
