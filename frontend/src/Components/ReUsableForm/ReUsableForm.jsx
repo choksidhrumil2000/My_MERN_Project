@@ -12,13 +12,24 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import styles from "./ReUsableForm.module.css";
 import Button from "@mui/material/Button";
 
-import axios from "axios";
 import { loginContext } from "../../Context/LoginContext";
 import { userContext } from "../../Context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../Context/SnackBarContext";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import {
+  AddUserInDataBase,
+  loginToUser,
+  RegisterUser,
+  UpdateUserInDatabase,
+} from "../../api/userApi";
+import {
+  addProductInDatabase,
+  updateProductInDatabase,
+} from "../../api/ProductApi";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 const ReUsableForm = ({
   form,
   editData,
@@ -33,6 +44,8 @@ const ReUsableForm = ({
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,24 +57,35 @@ const ReUsableForm = ({
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
-    if (form === "EditUser") {
-      setName(editData.name);
-      setEmail(editData.email);
-      setRole(editData.role);
-    } else if (form === "AddUser") {
-      setName("");
-      setEmail("");
-      setRole("");
-    } else if (form === "EditProduct") {
-      setName(editData.name);
-      setCategory(editData.category);
-      setPrice(editData.price);
-    } else if (form === "AddUser") {
-      setName("");
-      setCategory("");
-      setPrice(0);
-    }
+    handleVariablesAccordingToForm();
   }, []);
+
+  const handleVariablesAccordingToForm = () => {
+    switch (form) {
+      case "EditUser":
+        setName(editData.name);
+        setEmail(editData.email);
+        setRole(editData.role);
+        break;
+      case "AddUser":
+        setName("");
+        setEmail("");
+        setRole("");
+        break;
+      case "EditProduct":
+        setName(editData.name);
+        setCategory(editData.category);
+        setPrice(editData.price);
+        break;
+      case "AddProduct":
+        setName("");
+        setCategory("");
+        setPrice(0);
+        break;
+      default:
+        return;
+    }
+  };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -89,198 +113,196 @@ const ReUsableForm = ({
     setRole(e.target.value);
   };
 
-  const handleformSubmitActivity = async () => {
-    let resObj;
-    let userObj;
-    let productObj;
-    if (form === "LogIn") {
-      userObj = {
-        email,
-        password,
-      };
-      try {
-        resObj = await axios.post(
-          process.env.REACT_APP_API_URL + "/auth/login",
-          userObj,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } catch (err) {
-        showMessage(err.response.data.message, "error");
-        return;
-      }
-    } else if (form === "SignUp") {
-      userObj = {
-        name,
-        email,
-        password,
-        role: "user",
-      };
-      try {
-        resObj = await axios.post(
-          process.env.REACT_APP_API_URL + "/auth/register",
-          userObj,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } catch (err) {
-        showMessage(err.respone.data.message, "error");
-        return;
-      }
-    } else if (form === "AddUser") {
-      userObj = {
-        name,
-        email,
-        password,
-        role,
-      };
-      try {
-        resObj = await axios.post(
-          process.env.REACT_APP_API_URL + "/user/",
-          userObj,
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(
-                sessionStorage.getItem("token")
-              )}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        showMessage(resObj.data.message, "success");
-        closeModal();
-        refreshtable(
-          tableData.currentPage,
-          tableData.limit,
-          tableData.filter,
-          tableData.sort,
-          tableData.searchText
-        );
-      } catch (err) {
-        showMessage(err.response.data.message, "error");
-        return;
-      }
-      return;
-    } else if (form === "EditUser") {
-      userObj = {
-        name,
-        email,
-        role,
-      };
-      try {
-        resObj = await axios.put(
-          process.env.REACT_APP_API_URL + `/user/profile/${editData._id}`,
-          userObj,
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(
-                sessionStorage.getItem("token")
-              )}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        showMessage(resObj.data.message, "success");
-        closeModal();
-        refreshtable(
-          tableData.currentPage,
-          tableData.limit,
-          tableData.filter,
-          tableData.sort,
-          tableData.searchText
-        );
-      } catch (err) {
-        showMessage(err.response.data.message, "error");
-        return;
-      }
-
-      return;
-    } else if (form === "AddProduct") {
-      productObj = {
-        name,
-        category,
-        price,
-      };
-      try {
-        resObj = await axios.post(
-          process.env.REACT_APP_API_URL + "/product/",
-          productObj,
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(
-                sessionStorage.getItem("token")
-              )}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        showMessage(resObj.data.message, "success");
-        closeModal();
-        refreshtable(
-          tableData.currentPage,
-          tableData.limit,
-          tableData.filter,
-          tableData.sort,
-          tableData.searchText
-        );
-      } catch (err) {
-        showMessage(err.response.data.message, "error");
-        return;
-      }
-      return;
-    } else if (form === "EditProduct") {
-      productObj = {
-        name,
-        category,
-        price,
-      };
-      try {
-        resObj = await axios.put(
-          process.env.REACT_APP_API_URL + `/product/${editData._id}`,
-          productObj,
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(
-                sessionStorage.getItem("token")
-              )}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        showMessage(resObj.data.message, "success");
-        closeModal();
-        refreshtable(
-          tableData.currentPage,
-          tableData.limit,
-          tableData.filter,
-          tableData.sort,
-          tableData.searchText
-        );
-      } catch (err) {
-        showMessage(err.response.data.message, "error");
-        return;
-      }
-
-      return;
+  const handleLogInActivity = async () => {
+    setIsLoading(true);
+    const userObj = {
+      email,
+      password,
+    };
+    try {
+      const resObj = await loginToUser(userObj);
+      sessionStorage.setItem(
+        "token",
+        JSON.stringify(resObj.data.final_result.token)
+      );
+      sessionStorage.setItem(
+        "token_ExpiresIn",
+        JSON.stringify(resObj.data.final_result.expiresIn)
+      );
+      setUserData(resObj.data.final_result.user);
+      localStorage.setItem(
+        "userData",
+        JSON.stringify(resObj.data.final_result.user)
+      );
+      setIsLoggedIn(true);
+      showMessage("Welcome to The Dashboard!!!", "success");
+      navigate("/dashboard");
+    } catch (err) {
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
     }
-    sessionStorage.setItem(
-      "token",
-      JSON.stringify(resObj.data.final_result.token)
-    );
-    setUserData(resObj.data.final_result.user);
-    localStorage.setItem(
-      "userData",
-      JSON.stringify(resObj.data.final_result.user)
-    );
-    setIsLoggedIn(true);
-    showMessage("Welcome to The Dashboard!!!", "success");
-    navigate("/dashboard");
+  };
+
+  const handleSignUpActivity = async () => {
+    setIsLoading(true);
+    const userObj = {
+      name,
+      email,
+      password,
+      role: "user",
+    };
+    try {
+      const resObj = await RegisterUser(userObj);
+      console.log(resObj);
+      sessionStorage.setItem(
+        "token",
+        JSON.stringify(resObj.data.final_result.token)
+      );
+      sessionStorage.setItem(
+        "token_ExpiresIn",
+        JSON.stringify(resObj.data.final_result.expiresIn)
+      );
+      setUserData(resObj.data.final_result.user);
+      localStorage.setItem(
+        "userData",
+        JSON.stringify(resObj.data.final_result.user)
+      );
+      setIsLoggedIn(true);
+      showMessage("Welcome to The Dashboard!!!", "success");
+      navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddUserActivity = async () => {
+    setIsLoading(true);
+    const userObj = {
+      name,
+      email,
+      password,
+      role,
+    };
+    try {
+      const resObj = await AddUserInDataBase(userObj);
+      showMessage(resObj.data.message, "success");
+      closeModal();
+      refreshtable(
+        tableData.currentPage,
+        tableData.limit,
+        tableData.filter,
+        tableData.sort,
+        tableData.searchText
+      );
+    } catch (err) {
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditUserActivity = async () => {
+    setIsLoading(true);
+    const userObj = {
+      name,
+      email,
+      role,
+    };
+    try {
+      const resObj = await UpdateUserInDatabase(userObj, editData._id);
+      showMessage(resObj.data.message, "success");
+      closeModal();
+      refreshtable(
+        tableData.currentPage,
+        tableData.limit,
+        tableData.filter,
+        tableData.sort,
+        tableData.searchText
+      );
+    } catch (err) {
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddProductActivity = async () => {
+    setIsLoading(true);
+    const productObj = {
+      name,
+      category,
+      price,
+    };
+    try {
+      const resObj = await addProductInDatabase(productObj);
+      showMessage(resObj.data.message, "success");
+      closeModal();
+      refreshtable(
+        tableData.currentPage,
+        tableData.limit,
+        tableData.filter,
+        tableData.sort,
+        tableData.searchText
+      );
+    } catch (err) {
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditProductActivity = async () => {
+    setIsLoading(true);
+    const productObj = {
+      name,
+      category,
+      price,
+    };
+    try {
+      const resObj = await updateProductInDatabase(productObj, editData._id);
+      showMessage(resObj.data.message, "success");
+      closeModal();
+      refreshtable(
+        tableData.currentPage,
+        tableData.limit,
+        tableData.filter,
+        tableData.sort,
+        tableData.searchText
+      );
+    } catch (err) {
+      showMessage(err.response.data.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleformSubmitActivity = async () => {
+    switch (form) {
+      case "LogIn":
+        await handleLogInActivity();
+        break;
+      case "SignUp":
+        await handleSignUpActivity();
+        break;
+      case "AddUser":
+        await handleAddUserActivity();
+        break;
+      case "EditUser":
+        await handleEditUserActivity();
+        break;
+      case "AddProduct":
+        await handleAddProductActivity();
+        break;
+      case "EditProduct":
+        await handleEditProductActivity();
+        break;
+      default:
+        showMessage("Invalid Form Type!!!", "error");
+    }
   };
 
   const handleCategoryChange = (e) => {
@@ -291,7 +313,18 @@ const ReUsableForm = ({
     setPrice(e.target.value);
   };
 
-  return (
+  return isLoading ? (
+    <Box
+      sx={{
+        display: "flex",
+        // height: "100vh",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  ) : (
     <div>
       {form !== "LogIn" && (
         <TextField
@@ -302,7 +335,8 @@ const ReUsableForm = ({
           fullWidth
         />
       )}
-      {/* email................. */}
+
+      {/* Email field */}
       {form !== "AddProduct" && form !== "EditProduct" && (
         <TextField
           label="Email"
@@ -314,11 +348,10 @@ const ReUsableForm = ({
         />
       )}
 
-      {/* pasword.......................... */}
-
-      {(form === "LogIn" || form === "SignUp") && (
+      {/* Password field */}
+      {(form === "LogIn" || form === "SignUp" || form === "AddUser") && (
         <FormControl
-          className={`${styles.marginTop_16}`}
+          className={styles.marginTop_16}
           fullWidth
           variant="outlined"
         >
@@ -351,7 +384,7 @@ const ReUsableForm = ({
         </FormControl>
       )}
 
-      {/* Role...................................... */}
+      {/* Role field */}
       {(form === "AddUser" || form === "EditUser") && (
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} fullWidth>
           <InputLabel id="input-select">Role</InputLabel>
@@ -362,16 +395,13 @@ const ReUsableForm = ({
             fullWidth
             label="Role"
           >
-            {/* <MenuItem value="">
-              <em>None</em>
-            </MenuItem> */}
-            <MenuItem value={"user"}>user</MenuItem>
-            <MenuItem value={"admin"}>admin</MenuItem>
+            <MenuItem value="user">user</MenuItem>
+            <MenuItem value="admin">admin</MenuItem>
           </Select>
         </FormControl>
       )}
 
-      {/* Category of Product...................................... */}
+      {/* Category field */}
       {(form === "AddProduct" || form === "EditProduct") && (
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} fullWidth>
           <InputLabel id="input-select">Category</InputLabel>
@@ -382,15 +412,13 @@ const ReUsableForm = ({
             fullWidth
             label="Category"
           >
-            {/* <MenuItem value="">
-              <em>None</em>
-            </MenuItem> */}
-            <MenuItem value={"electronics"}>Electronics</MenuItem>
-            <MenuItem value={"cloths"}>Cloths</MenuItem>
+            <MenuItem value="electronics">Electronics</MenuItem>
+            <MenuItem value="cloths">Cloths</MenuItem>
           </Select>
         </FormControl>
       )}
-      {/* Price Of Product.......................... */}
+
+      {/* Price field */}
       {(form === "AddProduct" || form === "EditProduct") && (
         <TextField
           label="Price"
@@ -403,6 +431,7 @@ const ReUsableForm = ({
         />
       )}
 
+      {/* Forgot Password link */}
       {form === "LogIn" && (
         <Link
           to="/changepassword"
@@ -411,10 +440,11 @@ const ReUsableForm = ({
           Forgot Password?
         </Link>
       )}
-      {/* Login/Signup/AddUser/EditUser,etc.... Button...................... */}
+
+      {/* Submit button */}
       <Button
         variant="contained"
-        className={`${styles.marginTop_16}`}
+        className={styles.marginTop_16}
         fullWidth
         onClick={handleformSubmitActivity}
       >

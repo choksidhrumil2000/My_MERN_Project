@@ -103,7 +103,7 @@ function DrawerAppBar(props) {
                 <Divider />
               </Box>
             );
-          }else{
+          } else {
             return null;
           }
         })}
@@ -117,7 +117,13 @@ function DrawerAppBar(props) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar component="nav">
+      <AppBar
+        component="nav"
+        sx={{
+          width: "100vw",
+          left: "0",
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -160,7 +166,7 @@ function DrawerAppBar(props) {
           {drawer}
         </Drawer>
       </nav>
-      <Box component="main" sx={{ p: 3 }}>
+      <Box component="main" sx={{ p: 3, width: "100vw" }}>
         <Toolbar />
         {children}
       </Box>

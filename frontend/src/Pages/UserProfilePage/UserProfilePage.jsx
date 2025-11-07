@@ -12,12 +12,20 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { useSnackbar } from "../../Context/SnackBarContext";
-import axios from "axios";
 import { userContext } from "../../Context/UserContext";
+import {
+  updatePasswordInDatabase,
+  UpdateUserInDatabase,
+} from "../../api/userApi";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const UserProfilePage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingForPassword, setLoadingForPassword] = useState(false);
 
   const { userData, setUserData } = useContext(userContext);
 
@@ -43,52 +51,44 @@ const UserProfilePage = () => {
   };
 
   const OnSavePassword = async () => {
+    setLoadingForPassword(true);
     let resObj;
     try {
-      resObj = await axios.patch(
-        process.env.REACT_APP_API_URL + `/user/profile/${editedUserData.id}`,
-        {
-          password: newPassword,
-        }
-      );
+      resObj = await updatePasswordInDatabase(newPassword, editedUserData.id);
+      showMessage(resObj.data.message, "success");
+      setNewPassword("");
+      setSecuritySectionEdit(false);
     } catch (err) {
       showMessage(err.response.data.message, "error");
-      return;
+    } finally {
+      setLoadingForPassword(false);
     }
-    showMessage(resObj.data.message);
-    setNewPassword("");
-    setSecuritySectionEdit(false);
   };
 
   const OnSaveUserProfile = async () => {
+    setLoadingProfile(true);
     let resObj;
     const { id, ...dataToSent } = editedUserData;
     try {
-      resObj = await axios.put(
-        process.env.REACT_APP_API_URL + `/user/profile/${editedUserData.id}`,
-        dataToSent,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              sessionStorage.getItem("token")
-            )}`,
-          },
-        }
-      );
+      resObj = await UpdateUserInDatabase(dataToSent, id);
+      showMessage(resObj.data.message, "success");
+      setUserData(editedUserData);
+      setEditProfileSection(false);
     } catch (err) {
       showMessage(err.response.data.message, "error");
-      return;
+    } finally {
+      setLoadingProfile(false);
     }
-    showMessage(resObj.data.message);
-    setUserData(editedUserData);
-    setEditProfileSection(false);
   };
 
   const OnCloseEdit = (section) => {
-    if (section === "userProfile") setEditProfileSection(false);
-    else if (section === "security") setSecuritySectionEdit(false);
-    setEditedUserData(userData);
-    setNewPassword("");
+    if (section === "userProfile") {
+      setEditProfileSection(false);
+      setEditedUserData(userData);
+    } else if (section === "security") {
+      setSecuritySectionEdit(false);
+      setNewPassword("");
+    }
   };
 
   const handleNameChange = (e) => {
@@ -138,75 +138,69 @@ const UserProfilePage = () => {
         <EditIcon sx={{ cursor: "pointer" }} onClick={handleEditProfile} />
       </div>
       <div className={`${styles.section}`}>
-        <div className={`${styles.subSection}`}>
-          <p>You can Edit this Profile By clicking on Edit Button...</p>
-          <div style={{ width: "100%" }}>
-            <div className={`${styles.inputSection}`}>
-              <label htmlFor={"input-name"}>Password:</label>
-              <TextField
-                variant="standard"
-                id="input-name"
-                type="text"
-                value={editedUserData.name}
-                onChange={handleNameChange}
-                disabled={!editProfileSection}
-              />
-            </div>
-          </div>
-
-          <div style={{ width: "100%" }}>
-            <div className={`${styles.inputSection}`}>
-              <label htmlFor={"input-email"}>Email:</label>
-              <TextField
-                variant="standard"
-                id="input-email"
-                type="text"
-                width={`50%`}
-                value={editedUserData.email}
-                onChange={handleEmailChange}
-                disabled={!editProfileSection}
-              />
-            </div>
-          </div>
-
-          <div style={{ width: "100%" }}>
-            <div className={`${styles.inputSection}`}>
-              <label htmlFor="input-select">Role:</label>
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <Select
-                  id="input-select"
-                  value={editedUserData.role}
-                  onChange={handleRoleChange}
-                  fullWidth
-                  disabled={!editProfileSection}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={"user"}>user</MenuItem>
-                  <MenuItem value={"admin"}>admin</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          </div>
-
-          <div
-            className={`${styles.btnSection}`}
-            style={
-              !editProfileSection ? { display: "none" } : { display: "flex" }
-            }
+        <p style={{ textAlign: "center" }}>
+          You can Edit this Profile By clicking on Edit Button...
+        </p>
+        {loadingProfile ? (
+          <Box
+            sx={{
+              display: "flex",
+              // height: "100vh",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Button variant="contained" onClick={OnSaveUserProfile}>
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => OnCloseEdit("userProfile")}
+            <CircularProgress />
+          </Box>
+        ) : (
+          <div className={`${styles.subSection}`}>
+            <div style={{ width: "100%" }}>
+              <div className={`${styles.inputSection}`}>
+                <label htmlFor={"input-name"}>Name:</label>
+                <TextField
+                  variant="standard"
+                  id="input-name"
+                  type="text"
+                  value={editedUserData.name}
+                  onChange={handleNameChange}
+                  disabled={!editProfileSection}
+                />
+              </div>
+            </div>
+
+            <div style={{ width: "100%" }}>
+              <div className={`${styles.inputSection}`}>
+                <label htmlFor={"input-email"}>Email:</label>
+                <TextField
+                  variant="standard"
+                  id="input-email"
+                  type="text"
+                  width={`50%`}
+                  value={editedUserData.email}
+                  onChange={handleEmailChange}
+                  disabled={!editProfileSection}
+                />
+              </div>
+            </div>
+
+            <div
+              className={`${styles.btnSection}`}
+              style={
+                !editProfileSection ? { display: "none" } : { display: "flex" }
+              }
             >
-              Close
-            </Button>
+              <Button variant="contained" onClick={OnSaveUserProfile}>
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => OnCloseEdit("userProfile")}
+              >
+                Close
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Security Section */}
@@ -216,56 +210,73 @@ const UserProfilePage = () => {
         <EditIcon sx={{ cursor: "pointer" }} onClick={handlePasswordEdit} />
       </div>
       <div className={`${styles.section}`}>
-        <div className={`${styles.subSection}`}>
-          <p>You can Change Your Password By Editing this Password...</p>
-          <div className={`${styles.inputSection}`}>
-            <div>
-              <label htmlFor={"input-password"}>NewPassword:</label>
-              <FormControl variant="standard">
-                <TextField
-                  id="input-password"
-                  variant="standard"
-                  type={showPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={handlePasswordChnage}
-                  disabled={!securitySectionEdit}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </FormControl>
+        <p style={{ textAlign: "center" }}>
+          You can Change Your Password By Editing this Password...
+        </p>
+        {loadingForPassword ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <div className={`${styles.subSection}`}>
+            <div className={`${styles.inputSection}`}>
+              <div>
+                <label htmlFor={"input-password"}>NewPassword:</label>
+                <FormControl variant="standard">
+                  <TextField
+                    id="input-password"
+                    variant="standard"
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={handlePasswordChnage}
+                    disabled={!securitySectionEdit}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showPassword
+                                ? "hide the password"
+                                : "display the password"
+                            }
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            onMouseUp={handleMouseUpPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </FormControl>
+              </div>
+            </div>
+            <div
+              className={`${styles.btnSection}`}
+              style={
+                !securitySectionEdit ? { display: "none" } : { display: "flex" }
+              }
+            >
+              <Button variant="contained" onClick={OnSavePassword}>
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => OnCloseEdit("security")}
+              >
+                Close
+              </Button>
             </div>
           </div>
-          <div
-            className={`${styles.btnSection}`}
-            style={
-              !securitySectionEdit ? { display: "none" } : { display: "flex" }
-            }
-          >
-            <Button variant="contained" onClick={OnSavePassword}>
-              Save
-            </Button>
-            <Button variant="outlined" onClick={() => OnCloseEdit("security")}>
-              Close
-            </Button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

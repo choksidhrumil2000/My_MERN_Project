@@ -2,9 +2,9 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import styles from "./ChangePasswordPage.module.css";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { useSnackbar } from "../../Context/SnackBarContext";
 import { useNavigate } from "react-router-dom";
+import { getUserByEmail, updatePasswordInDatabase } from "../../api/userApi";
 
 const ChangePasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -22,15 +22,13 @@ const ChangePasswordPage = () => {
     if (error) return;
     let resObj;
     try {
-      resObj = await axios.get(
-        process.env.REACT_APP_API_URL + `/user/profile?email=${email}`
-      );
+      resObj = await getUserByEmail(email);
+      setCurrUserData(resObj.data.userData);
+      showMessage("You Are Verified!!", "success");
+      setVerified(true);
     } catch (err) {
       showMessage(err.response.data.message, "error");
-      return;
     }
-    setCurrUserData(resObj.data.userData);
-    setVerified(true);
   };
 
   const handleEmailChange = (e) => {
@@ -57,18 +55,12 @@ const ChangePasswordPage = () => {
   const changePassword = async () => {
     let resObj;
     try {
-      resObj = await axios.patch(
-        process.env.REACT_APP_API_URL + `/user/profile/${currUserData._id}`,
-        {
-          password: newPassword,
-        }
-      );
+      resObj = await updatePasswordInDatabase(newPassword, currUserData._id);
+      showMessage(resObj.data.message, "success");
+      navigate("/");
     } catch (err) {
       showMessage(err.response.data.message, "error");
-      return;
     }
-    showMessage(resObj.data.message);
-    navigate("/");
   };
   return (
     <div className={`${styles.mainSectionDiv}`}>

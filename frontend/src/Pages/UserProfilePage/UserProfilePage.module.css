@@ -3,6 +3,14 @@
   justify-content: space-between;
   align-items: center;
 }
+@media (min-width: 768px) {
+  .mainSectionDiv {
+    width: 50vw;
+  }
+  .section {
+    width: 50vw;
+  }
+}
 .section {
   border: 1px solid black;
   border-radius: 10px;

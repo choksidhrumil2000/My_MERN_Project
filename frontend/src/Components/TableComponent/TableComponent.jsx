@@ -52,13 +52,16 @@ const TableComponent = ({
 
   return (
     <div>
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          overflowX: "auto",
+          display: "block",
+        }}
+      >
         <Table
           sx={{
-            minWidth: "650px",
-            "@media (max-width: 763px)": {
-              minWidth: "763px",
-            },
+            minWidth: "750px",
           }}
           aria-label="simple table"
         >
@@ -73,11 +76,6 @@ const TableComponent = ({
                   </TableCell>
                 );
               })}
-              {/* <TableCell>Sr.No.</TableCell>
-              <TableCell align="right">Name</TableCell>
-              <TableCell align="right">Email</TableCell>
-              <TableCell align="right">Role</TableCell>
-              <TableCell align="right">Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -86,7 +84,7 @@ const TableComponent = ({
                 key={row._id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" align="right">
                   {data.startingIndex + i + 1}
                 </TableCell>
                 {generateHeader(type).map((item, i, arr) => {
@@ -98,21 +96,22 @@ const TableComponent = ({
                     );
                   }
                 })}
-                {/* <TableCell align="right">{row.name}</TableCell>
-                <TableCell align="right">{row.email}</TableCell>
-                <TableCell align="right">{row.role}</TableCell> */}
-                <TableCell align="right">
-                  <EditIcon
-                    onClick={() => handleEdit(row)}
-                    sx={{ marginRight: "10px", cursor: "pointer" }}
-                  />
-                  {userData.email !== row.email && (
-                    <DeleteIcon
-                      onClick={() => handleDelete(row._id)}
-                      sx={{ marginTop: "10px", cursor: "pointer" }}
-                    />
-                  )}
-                </TableCell>
+                {userData.role === "admin" && (
+                  <TableCell align="right">
+                    {userData.email !== row.email && (
+                      <EditIcon
+                        onClick={() => handleEdit(row)}
+                        sx={{ marginRight: "10px", cursor: "pointer" }}
+                      />
+                    )}
+                    {userData.email !== row.email && (
+                      <DeleteIcon
+                        onClick={() => handleDelete(row._id)}
+                        sx={{ marginTop: "10px", cursor: "pointer" }}
+                      />
+                    )}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

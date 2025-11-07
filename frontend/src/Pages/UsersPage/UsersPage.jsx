@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import TableComponent from "../../Components/TableComponent/TableComponent";
 import { useEffect } from "react";
-import axios from "axios";
 import { useSnackbar } from "../../Context/SnackBarContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import SearchIcon from "@mui/icons-material/Search";
@@ -13,10 +12,14 @@ import MenuItem from "@mui/material/MenuItem";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import Tooltip from "@mui/material/Tooltip";
 import BasicModal from "../../Components/BasicModal/BasicModal";
-import { getAllUsersDataFromChangedParameter } from "../../api/userApi";
+import {
+  deleteUserInDatabase,
+  getAllUsersDataFromChangedParameter,
+} from "../../api/userApi";
 import ReUsableForm from "../../Components/ReUsableForm/ReUsableForm";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import { debounce } from "../../utils/debounce";
 
 const UsersPage = () => {
   const [allUsersData, setAllUsersData] = useState([]);
@@ -24,7 +27,7 @@ const UsersPage = () => {
   const [startingIndex, setStartingIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [limit, setLimit] = useState(0);
+  const [limit, setLimit] = useState(5);
   const [searchText, setSearchText] = useState("");
   const [sort, setSort] = useState("asc");
   const [filter, setFilter] = useState("all");
@@ -41,35 +44,6 @@ const UsersPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { showMessage } = useSnackbar();
-
-  useEffect(() => {
-    // const getAllUsersData = async () => {
-    //   setIsLoading(true);
-    //   let resObj;
-    //   try {
-    //     resObj = await axios.get(process.env.REACT_APP_API_URL + `/user/`, {
-    //       headers: {
-    //         Authorization: `Bearer ${JSON.parse(
-    //           sessionStorage.getItem("token")
-    //         )}`,
-    //       },
-    //     });
-    //   } catch (err) {
-    //     showMessage(err.response.data.message, "error");
-    //     setIsLoading(false);
-    //     return;
-    //   }
-    //   setAllUsersData(resObj.data.allUsersData);
-    //   setFinalData(resObj.data.final_data);
-    //   setStartingIndex(parseInt(resObj.data.startingIndex));
-    //   setCurrentPage(parseInt(resObj.data.currentPage));
-    //   setTotalPages(parseInt(resObj.data.totalPages));
-    //   setIsLoading(false);
-    // };
-
-    // getAllUsersData();
-    getAllUsersDataFromChangedParameters();
-  }, []);
 
   const getAllUsersDataFromChangedParameters = useCallback(
     async (page, limit, filter, sort, search) => {
@@ -109,7 +83,7 @@ const UsersPage = () => {
       sort,
       searchText
     );
-  }, [currentPage, limit, filter, searchText, sort]);
+  }, [currentPage, limit, filter, sort]);
 
   const data = {
     allUsersData,
@@ -134,17 +108,6 @@ const UsersPage = () => {
     setSort,
   };
 
-  // debounce function......
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
-
   const handleSearch = useCallback(
     (value) => {
       setCurrentPage(1);
@@ -166,39 +129,52 @@ const UsersPage = () => {
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
     setCurrentPage(1);
-    getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
+    // getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
   };
 
   const handleSortChange = (e) => {
     setSort(e.target.value);
     setCurrentPage(1);
-    getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
+    // getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
   };
 
-  const handleResetFilter = () => {
-    setSearchText("");
-    setFilter("all");
-    setSort("asc");
-    getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
+  const handleResetFilter = async () => {
+    // setSearchText("");
+    // setFilter("all");
+    // setSort("asc");
+    // setCurrentPage(1);
+    // getAllUsersDataFromChangedParameters(1, limit, filter, sort, searchText);
+    const ogSearchText = "";
+    const ogFilter = "all";
+    const ogSort = "asc";
+    const ogCurrentPage = 1;
+    setSearchText(ogSearchText);
+    setFilter(ogFilter);
+    setSort(ogSort);
+    setCurrentPage(ogCurrentPage);
+    if (
+      ogFilter === filter &&
+      ogSort === sort &&
+      ogCurrentPage === currentPage
+    ) {
+      await getAllUsersDataFromChangedParameters(
+        ogCurrentPage,
+        limit,
+        ogFilter,
+        ogSort,
+        ogSearchText
+      );
+    }
   };
 
   const DeleteUserRcord = async (userId) => {
     setIsLoading(true);
     try {
-      const resObj = await axios.delete(
-        `${process.env.REACT_APP_API_URL}/user/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(
-              sessionStorage.getItem("token")
-            )}`,
-          },
-        }
-      );
+      const resObj = await deleteUserInDatabase(userId);
 
       showMessage(resObj.data.message, "success");
       if (data.finalData.length === 1 && data.currentPage === data.totalPages) {
-        getAllUsersDataFromChangedParameters(
+        await getAllUsersDataFromChangedParameters(
           currentPage - 1,
           limit,
           filter,
@@ -206,7 +182,7 @@ const UsersPage = () => {
           searchText
         );
       } else {
-        getAllUsersDataFromChangedParameters(
+        await getAllUsersDataFromChangedParameters(
           currentPage,
           limit,
           filter,
@@ -257,20 +233,14 @@ const UsersPage = () => {
           alignItems: "center",
           gap: "10px",
           marginBottom: "12px",
-          "@media (max-width: 600px)": {
-            flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "center",
-          },
+          flexWrap: "wrap",
+          mx: "5px",
         }}
       >
         <Box
           sx={{
             display: "flex",
             alignItems: "flex-end",
-            "@media (max-width: 600px)": {
-              width: "100%",
-            },
           }}
         >
           <SearchIcon
@@ -287,11 +257,6 @@ const UsersPage = () => {
             value={searchText}
             onChange={handleSearchTextChange}
             // ref={searchFieldRef}
-            sx={{
-              "@media (max-width: 600px)": {
-                width: "50%",
-              },
-            }}
           />
         </Box>
 

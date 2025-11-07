@@ -6,6 +6,7 @@ const generateTokenResponse = (user) => {
 
   return {
     token,
+    expiresIn: process.env.jwt_expiresIn,
     user: {
       id: user._id,
       name: user.name,

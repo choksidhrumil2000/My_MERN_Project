@@ -1,11 +1,11 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomeComponent from "./Components/HomeComponent/HomeComponent";
-import DashBoard from "./Components/DashBoard/Dashboard";
+import DashBoard from "./Pages/DashBoard/Dashboard";
 import { LoginContextProvider } from "./Context/LoginContext";
 import { UserContextProvider } from "./Context/UserContext";
 import { SnackbarProvider } from "./Context/SnackBarContext";
 import ChangePasswordPage from "./Pages/ChangePasswordPage/ChangePasswordPage";
+import HomePage from "./Pages/HomePage/HomePage";
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
         <LoginContextProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<HomeComponent />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<DashBoard />} />
               <Route path="/changepassword" element={<ChangePasswordPage />} />
             </Routes>

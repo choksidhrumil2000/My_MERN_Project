@@ -6,10 +6,10 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import styles from "./HomeComponent.module.css";
-import ReUsableForm from "../ReUsableForm/ReUsableForm";
+import styles from "./HomePage.module.css";
+import ReUsableForm from "../../Components/ReUsableForm/ReUsableForm";
 
-const HomeComponent = () => {
+const HomePage = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useContext(loginContext);
 
@@ -49,4 +49,4 @@ const HomeComponent = () => {
   );
 };
 
-export default HomeComponent;
+export default HomePage;

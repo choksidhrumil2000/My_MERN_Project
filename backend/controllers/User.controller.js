@@ -41,8 +41,7 @@ const getUsers = async (req, res) => {
 
   const usersData = await userService.getUsers();
 
-  let final_data = usersData;
-  // console.log(final_data);
+  let final_data = JSON.parse(JSON.stringify(usersData));
   if (search) {
     final_data = final_data.filter(
       (item) =>
