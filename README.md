@@ -3,39 +3,6 @@
 A full-stack **MERN (MongoDB, Express.js, React.js, Node.js)** application with separate frontend and backend folders.  
 This project includes authentication, CRUD functionality, and role-based access for users and admins.
 
----
-
-## 📁 Folder Structure
-
-Project/
-├── backend/
-│ ├── server.js # Entry point of the backend (Express app)
-│ ├── package.json
-│ ├── .env # Environment variables (PORT, DB_URI, JWT_SECRET, etc.)
-│ ├── models/ # Mongoose schemas
-│ ├── routes/ # Express routes
-│ ├── controllers/ # Business logic
-│ ├── middleware/ # JWT authentication, validation, etc.
-│ ├── utils/ # Helper functions
-| ├── Services/ #Communicates WIth Modal
-| └── Validation/ #Schemas for validation
-│
-├── frontend/
-│ ├── src/
-│ │ ├── components/ # Reusable UI components
-│ │ ├── pages/ # React pages
-│ │ ├── context/ # Global context (e.g. UserContext, SnackbarContext)
-│ │ ├── api/ # Axios API functions
-| | ├── utils/ # Helper functions
-│ │ └── App.js
-│ ├── package.json
-│ ├── .env # Frontend env (e.g. REACT_APP_API_URL)
-│ └── public/
-│
-└── README.md
-
----
-
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the Repository
