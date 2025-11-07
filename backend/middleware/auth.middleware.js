@@ -9,10 +9,8 @@ const protect = async (req, res, next) => {
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      // const decoded = -(jwt.verify(token, process.env.jwt_secret));
       const decoded = jwt.verify(token, process.env.jwt_secret);
       req.user = await User.findById(decoded.id).select("-password");
-      // console.log("loggedin User:",req.user);
       return next();
     } catch (err) {
       res.status(401).json({
@@ -26,8 +24,6 @@ const protect = async (req, res, next) => {
 };
 
 const authorizeRole = (role) => (req, res, next) => {
-  //   if (!req.user || !role.includes(req.user.role)) {
-  // console.log("loggedin User: ", req.user);
   if (!req.user || !(req.user.role === role)) {
     return res.status(403).json({
       message: `Access Denied: permission  not granted only ${role} can access!!`,

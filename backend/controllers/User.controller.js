@@ -92,7 +92,6 @@ const getProfile = async (req, res) => {
   const userData = await userService.getUserByUserId(userId);
   if (!userData)
     throw new ApiError(404, "User Not Found!! Data Could not be fetched!!!");
-  // console.log(userData);
 
   res.status(200).json({
     userData,
@@ -104,7 +103,6 @@ const getProfileByEmail = async (req, res) => {
   const userData = await userService.getUserbyEmail(email);
   if (!userData)
     throw new ApiError(404, "User Not Found!! Data Could not be fetched!!!");
-  // console.log(userData);
 
   res.status(200).json({
     userData,
@@ -117,21 +115,11 @@ const updateProfile = async (req, res) => {
   const userData = await userService.getUserByUserId(userId);
   if (!userData) throw new ApiError(404, "User Not Found!!!");
 
-  //   const updatedData = {
-  //     name: updateData.name,
-  //     email: updateData.email,
-  //     password: updateData.password,
-  //     role: updateData.role,
-  //   };
-
   userData.name = updateData.name;
   userData.email = updateData.email;
-  //   userData.password = updateData.password;
   userData.role = updateData.role;
 
   const newData = await userData.save();
-  //   const newData = await userService.findOneAndUpdate(userData,updatedData);
-  //   if(!newData) throw new ApiError(304,"Update Does not Happen")
   res.status(200).json({
     newData,
     message: "Updated Successfully",
