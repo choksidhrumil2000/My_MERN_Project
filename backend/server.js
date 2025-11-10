@@ -10,12 +10,12 @@ const app = express();
 
 console.log("connecting to MOngodb.......");
 mongoose
-  .connect("mongodb://localhost:27017/myapp")
+  .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("successfully connected to mongodb database");
   })
-  .catch(() => {
-    console.log("Error in connecting Database.....");
+  .catch((err) => {
+    console.log("Error in connecting Database.....", err);
   });
 
 app.use(cors()); //allow requests from frontend......
@@ -27,6 +27,6 @@ app.use("/api/product", productRoutes);
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is Running on ${process.env.PORT}.....`);
 });
