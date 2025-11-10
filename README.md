@@ -1,89 +1,53 @@
-# 🌐 MERN Stack Project
+# MY_MERN_PROJECT
 
-A full-stack **MERN (MongoDB, Express.js, React.js, Node.js)** application with separate frontend and backend folders.  
-This project includes authentication, CRUD functionality, and role-based access for users and admins.
+A full-stack **MERN (MongoDB, Express.js, React.js, Node.js)** web application that provides seamless interaction between the frontend and backend.  
+The app includes authentication, CRUD operations, and responsive UI — deployed with **Render** (backend) and **Vercel** (frontend).
 
-## ⚙️ Installation & Setup
+---
 
-### 1️⃣ Clone the Repository
+## 🚀 Live Demo
 
-```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd Project
+- **Frontend (Vercel):** [https://my-mern-project-nine.vercel.app/]
+- **Backend (Render):** [https://my-mern-project-2xk2.onrender.com]
 
+---
 
-2️⃣ Backend Setup
-cd backend
-npm install
+## 🛠️ Tech Stack
 
-Start the backend server:
-npm run dev
+**Frontend:**
 
-(Assuming nodemon is installed; otherwise, use node server.js)
+- React.js
+- Axios (for API requests)
+- React Router DOM
+- Material-UI
+- Vercel (Deployment)
 
-3️⃣ Frontend Setup
-cd ../frontend
-npm install
+**Backend:**
 
-Run the React app:
-npm start
+- Node.js
+- Express.js
+- MongoDB with Mongoose
+- JWT Authentication And bcrypt
+- Render (Deployment)
 
+---
 
-🚀 Running the Project
-✅ Development Mode
-Start both frontend and backend simultaneously:
-# In two terminals
-cd backend && npm run dev
-cd frontend && npm start
+✨ Features
 
-The app will be available at:
-Frontend → http://localhost:3000
-Backend  → http://localhost:5000
+🔐 User Authentication (Signup / Login)
 
+📦 CRUD Operations
 
-🧩 Technologies Used
-Frontend
-React.js (with Hooks & Context API)
-Material UI (MUI)
-Axios
-React Router
+📊 Dynamic Data from API
 
-Backend
-Node.js
-Express.js
-MongoDB (Mongoose)
-JWT Authentication
-bcrypt.js for password hashing
-dotenv for environment variables
+🧭 Routing and Protected Routes
 
-🔐 Features
+💡 Responsive UI
 
-🔑 User Authentication (Signup / Login)
+⚙️ Environment-based configuration (local / deployed)
 
-🧑‍💼 Role-based Access (Admin / User)
+🧠 Author
 
-🧾 CRUD Operations (Users, Products, etc.)
-
-🔍 Search, Sort, and Filter
-
-🕒 Pagination
-
-⚡ Responsive UI with Material UI
-
-🧠 Context API for global state management
-
-🚨 Snackbar Notifications for success/error messages
-
-🧰 Scripts
-Backend Scripts
-npm run dev      # Start backend with nodemon
-npm start        # Start backend with node
-
-Frontend Scripts
-npm start        # Start React app
-npm run build    # Build production version
-
-🧑‍💻 Author
-Dhrumil Choksi
-📧 choksidhrumil2000@gmail.com
-```
+Developed by: [Dhrumil Choksi]
+GitHub: [https://www.github.com/choksidhrumil2000]
+Email: [choksidhrumil2000@gmail.com]
